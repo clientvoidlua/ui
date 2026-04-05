@@ -1,127 +1,188 @@
--- Gui to Lua
--- Version: 3.2
+--// new interface
+local CoreGui = game:GetService("CoreGui")
+local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 
--- Instances:
+function identifyexecutor()
+    return "MobileBlox", "1.0.0"
+end
 
-local MobileBlox = Instance.new('ScreenGui')
-local Main = Instance.new('Frame')
-local TextBox = Instance.new('TextBox')
-local Clear = Instance.new('TextButton')
-local Execute = Instance.new('TextButton')
+local function getThreadIdentity()
+    if getthreadidentity then
+        return getthreadidentity()
+    elseif getidentity then
+        return getidentity()
+    end
+    return "Unknown"
+end
 
---Properties:
-
+local MobileBlox = Instance.new("ScreenGui")
 MobileBlox.Name = "MobileBlox"
-MobileBlox.Parent = game:WaitForChild('CoreGui')
+MobileBlox.Parent = CoreGui
+MobileBlox.IgnoreGuiInset = true
+MobileBlox.DisplayOrder = 999999
 
-Main.Name = "Main"
-Main.Parent = MobileBlox
-Main.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-Main.Position = UDim2.new(0.318584085, 0, 0.197959185, 0)
-Main.Size = UDim2.new(0, 492, 0, 282)
+local UIScale = Instance.new("UIScale", MobileBlox)
+UIScale.Scale = math.clamp(workspace.CurrentCamera.ViewportSize.X / 1920, 0.6, 1.2)
 
-TextBox.Parent = Main
-TextBox.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
-TextBox.Position = UDim2.new(0.0375582054, 0, 0.0874655992, 0)
-TextBox.Size = UDim2.new(0, 450, 0, 195)
+local function corner(obj)
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0,8)
+    c.Parent = obj
+end
+
+local Main = Instance.new("Frame", MobileBlox)
+Main.BackgroundColor3 = Color3.fromRGB(50,50,50)
+Main.Position = UDim2.new(0.318,0,0.198,0)
+Main.Size = UDim2.new(0,492,0,282)
+corner(Main)
+
+local Title = Instance.new("TextLabel", Main)
+Title.Size = UDim2.new(1,0,0,25)
+Title.BackgroundTransparency = 1
+Title.Text = "MobileBlox v1.0.0"
+Title.TextColor3 = Color3.fromRGB(255,255,255)
+Title.TextScaled = true
+
+local TextBox = Instance.new("TextBox", Main)
+TextBox.BackgroundColor3 = Color3.fromRGB(33,33,33)
+TextBox.Position = UDim2.new(0.037,0,0.12,0)
+TextBox.Size = UDim2.new(0,450,0,180)
 TextBox.ClearTextOnFocus = false
-TextBox.Font = Enum.Font.Ubuntu
 TextBox.MultiLine = true
+TextBox.TextWrapped = true
 TextBox.Text = ""
-TextBox.TextColor3 = Color3.fromRGB(186, 186, 186)
-TextBox.TextSize = 14.000
+TextBox.PlaceholderText = "-- enter your script here..."
+TextBox.Font = Enum.Font.Ubuntu
+TextBox.TextColor3 = Color3.fromRGB(255,255,255)
+TextBox.PlaceholderColor3 = Color3.fromRGB(150,150,150)
+TextBox.TextSize = 14
 TextBox.TextXAlignment = Enum.TextXAlignment.Left
 TextBox.TextYAlignment = Enum.TextYAlignment.Top
+corner(TextBox)
 
-Clear.Name = "Clear"
-Clear.Parent = Main
-Clear.BackgroundColor3 = Color3.fromRGB(144, 0, 0)
-Clear.Position = UDim2.new(0.544715464, 0, 0.822695017, 0)
-Clear.Size = UDim2.new(0, 200, 0, 50)
-Clear.Font = Enum.Font.SourceSans
-Clear.Text = "Clear"
-Clear.TextColor3 = Color3.fromRGB(0, 0, 0)
-Clear.TextScaled = true
-Clear.TextSize = 14.000
-Clear.TextWrapped = true
-
-Execute.Name = "Execute"
-Execute.Parent = Main
-Execute.BackgroundColor3 = Color3.fromRGB(63, 190, 93)
-Execute.Position = UDim2.new(0.0365853645, 0, 0.822695017, 0)
-Execute.Size = UDim2.new(0, 200, 0, 50)
-Execute.Font = Enum.Font.SourceSans
+local Execute = Instance.new("TextButton", Main)
 Execute.Text = "Execute"
-Execute.TextColor3 = Color3.fromRGB(0, 0, 0)
+Execute.Size = UDim2.new(0,200,0,50)
+Execute.Position = UDim2.new(0.036,0,0.82,0)
+Execute.BackgroundColor3 = Color3.fromRGB(63,190,93)
+Execute.TextColor3 = Color3.fromRGB(255,255,255)
 Execute.TextScaled = true
-Execute.TextSize = 14.000
-Execute.TextWrapped = true
+corner(Execute)
 
--- Scripts:
+local Clear = Instance.new("TextButton", Main)
+Clear.Text = "Clear"
+Clear.Size = UDim2.new(0,200,0,50)
+Clear.Position = UDim2.new(0.544,0,0.82,0)
+Clear.BackgroundColor3 = Color3.fromRGB(144,0,0)
+Clear.TextColor3 = Color3.fromRGB(255,255,255)
+Clear.TextScaled = true
+corner(Clear)
 
-local function BGWS_fake_script() -- Main.DragScript
-	local script = Instance.new('LocalScript', Main)
+local Toggle = Instance.new("TextButton", MobileBlox)
+Toggle.Size = UDim2.new(0,60,0,60)
+Toggle.Position = UDim2.new(0,20,0.5,0)
+Toggle.BackgroundColor3 = Color3.fromRGB(40,40,40)
+Toggle.Text = "MB"
+Toggle.TextColor3 = Color3.fromRGB(255,255,255)
+Toggle.TextScaled = true
+corner(Toggle)
 
-	--Not made by me, check out this video: https://www.youtube.com/watch?v=z25nyNBG7Js&t=22s
-	--Put this inside of your Frame and configure the speed if you would like.
-	--Enjoy! Credits go to: https://www.youtube.com/watch?v=z25nyNBG7Js&t=22s
+local function notify(text)
+    local Notif = Instance.new("TextLabel", MobileBlox)
+    Notif.Size = UDim2.new(0,250,0,50)
+    Notif.Position = UDim2.new(1,300,1,-60)
+    Notif.BackgroundColor3 = Color3.fromRGB(30,30,30)
+    Notif.TextColor3 = Color3.fromRGB(255,255,255)
+    Notif.TextScaled = true
+    Notif.Text = text
+    corner(Notif)
 
-	local UIS = game:GetService('UserInputService')
-	local frame = script.Parent
-	local dragToggle = nil
-	local dragSpeed = 0.25
-	local dragStart = nil
-	local startPos = nil
+    TweenService:Create(Notif, TweenInfo.new(0.25), {
+        Position = UDim2.new(1,-260,1,-60)
+    }):Play()
 
-	local function updateInput(input)
-		local delta = input.Position - dragStart
-		local position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
-			startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-		game:GetService('TweenService'):Create(frame, TweenInfo.new(dragSpeed), {Position = position}):Play()
-	end
-
-	frame.InputBegan:Connect(function(input)
-		if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-			dragToggle = true
-			dragStart = input.Position
-			startPos = frame.Position
-			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then
-					dragToggle = false
-				end
-			end)
-		end
-	end)
-
-	UIS.InputChanged:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-			if dragToggle then
-				updateInput(input)
-			end
-		end
-	end)
-
+    task.delay(3, function()
+        TweenService:Create(Notif, TweenInfo.new(0.25), {
+            Position = UDim2.new(1,300,1,-60)
+        }):Play()
+        task.wait(0.25)
+        Notif:Destroy()
+    end)
 end
-coroutine.wrap(BGWS_fake_script)()
-local function NBUT_fake_script() -- Clear.LocalScript
-	local script = Instance.new('LocalScript', Clear)
 
-	local box = script.Parent.Parent.TextBox
-	local btn = script.Parent
+local function dragify(frame)
+    local dragging = false
+    local dragInput, dragStart, startPos
 
-	btn.MouseButton1Click:Connect(function()
-		box.Text = "";
-	end)
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UIS.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
 end
-coroutine.wrap(NBUT_fake_script)()
-local function OBDPHLQ_fake_script() -- Execute.LocalScript
-	local script = Instance.new('LocalScript', Execute)
 
-	local box = script.Parent.Parent.TextBox
-	local btn = script.Parent
+dragify(Main)
+dragify(Toggle)
 
-	btn.MouseButton1Click:Connect(function()
-		loadstring(box.Text)()
-	end)
-end
-coroutine.wrap(OBDPHLQ_fake_script)()
+local opened = true
+
+Toggle.MouseButton1Click:Connect(function()
+    opened = not opened
+    Main.Visible = opened
+end)
+
+Clear.MouseButton1Click:Connect(function()
+    TextBox.Text = ""
+    notify("Cleared")
+end)
+
+Execute.MouseButton1Click:Connect(function()
+    local func, err = loadstring(TextBox.Text)
+    if not func then
+        notify("Compile Error")
+        warn(err)
+        return
+    end
+
+    local success, runtimeErr = pcall(func)
+
+    if success then
+        notify("Executed")
+    else
+        notify("Runtime Error")
+        warn(runtimeErr)
+    end
+end)
+
+local name, ver = identifyexecutor()
+print(name, ver)
+print("Thread:", getThreadIdentity())
+
+notify("MobileBlox v1.0.0 Loaded")
