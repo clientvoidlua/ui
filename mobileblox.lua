@@ -1,4 +1,5 @@
 --// new interface
+--// old interface: https://raw.githubusercontent.com/clientvoidlua/ui/refs/heads/main/old-mobileblox.lua
 local CoreGui = game:GetService("CoreGui")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
