@@ -4,7 +4,7 @@
 
 
 
---- ts is not totally fixed twin🥹
+--ts is not totally fixed twin🥹
 
 
 
