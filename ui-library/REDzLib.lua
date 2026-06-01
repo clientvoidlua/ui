@@ -100,7 +100,7 @@ local redzlib = {
   Tabs = {},
   ScreenGui = nil,
   Device = UserInputService.TouchEnabled and "Mobile" or "Computer",
-  Icons = loadstring(game:HttpGet("https://raw.githubusercontent.com/raelhubfunctions/Rael-hub-libary/refs/heads/main/Icons.lua"))()
+  Icons = loadstring(game:HttpGet("https://raw.githubusercontent.com/clientvoidlua/ui/refs/heads/main/ui-library/Icons.lua"))()
 }
 
 local ViewportSize = workspace.CurrentCamera.ViewportSize
